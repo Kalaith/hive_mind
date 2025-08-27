@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hive Mind - Idle Colony Game</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="game-container">
+        <!-- Header with Resources -->
+        <header class="header">
+            <div class="header-content">
+                <h1 class="game-title">🐛 Hive Mind</h1>
+                <div class="resources">
+                    <div class="resource-item">
+                        <span class="resource-icon">🧬</span>
+                        <span class="resource-label">Biomass</span>
+                        <span class="resource-value" id="biomass-value">50</span>
+                    </div>
+                    <div class="resource-item">
+                        <span class="resource-icon">⚡</span>
+                        <span class="resource-label">Energy</span>
+                        <span class="resource-value" id="energy-value">25</span>
+                    </div>
+                    <div class="resource-item">
+                        <span class="resource-icon">🧠</span>
+                        <span class="resource-label">Knowledge</span>
+                        <span class="resource-value" id="knowledge-value">0</span>
+                    </div>
+                    <div class="resource-item">
+                        <span class="resource-icon">🗺️</span>
+                        <span class="resource-label">Territory</span>
+                        <span class="resource-value" id="territory-value">0</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Game Area -->
+        <main class="main-content">
+            <!-- Left Panel - Hive Visualization -->
+            <div class="left-panel">
+                <div class="hive-visualization">
+                    <h2>The Hive</h2>
+                    <div class="hive-core" id="hive-core">
+                        <div class="hive-pulse"></div>
+                        <div class="hive-center">
+                            <span class="hive-icon">🕷️</span>
+                        </div>
+                    </div>
+                    <div class="unit-counts">
+                        <div class="unit-count" id="workers-count">
+                            <span class="unit-icon">🐛</span>
+                            <span class="unit-label">Workers</span>
+                            <span class="unit-value">0</span>
+                        </div>
+                        <div class="unit-count" id="scouts-count" style="display: none;">
+                            <span class="unit-icon">🦗</span>
+                            <span class="unit-label">Scouts</span>
+                            <span class="unit-value">0</span>
+                        </div>
+                        <div class="unit-count" id="soldiers-count" style="display: none;">
+                            <span class="unit-icon">🐞</span>
+                            <span class="unit-label">Soldiers</span>
+                            <span class="unit-value">0</span>
+                        </div>
+                        <div class="unit-count" id="specialists-count" style="display: none;">
+                            <span class="unit-icon">🕸️</span>
+                            <span class="unit-label">Specialists</span>
+                            <span class="unit-value">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Evolution Panel -->
+                <div class="evolution-panel">
+                    <h3>Evolution</h3>
+                    <div class="evolution-points">
+                        <span class="evolution-icon">🧬</span>
+                        <span>Points: <span id="evolution-points">0</span></span>
+                    </div>
+                    <div class="evolution-bonuses" id="evolution-bonuses">
+                        <!-- Evolution bonuses will be populated by JavaScript -->
+                    </div>
+                    <button class="btn btn--primary cocoon-btn" id="cocoon-btn" disabled>
+                        Enter Cocoon (Requires 50 units)
+                    </button>
+                </div>
+            </div>
+
+            <!-- Center Panel - Unit Production -->
+            <div class="center-panel">
+                <div class="production-panel">
+                    <h2>Unit Production</h2>
+                    <div class="unit-production">
+                        <div class="unit-card" id="worker-card">
+                            <div class="unit-header">
+                                <span class="unit-icon">🐛</span>
+                                <h3>Worker</h3>
+                            </div>
+                            <p class="unit-description">Gathers biomass and energy for the hive</p>
+                            <div class="unit-cost">
+                                <span class="cost-item">🧬 <span id="worker-biomass-cost">10</span></span>
+                                <span class="cost-item">⚡ <span id="worker-energy-cost">5</span></span>
+                            </div>
+                            <div class="unit-production-rate">
+                                <span class="production-item">🧬 +2/3s</span>
+                                <span class="production-item">⚡ +1/3s</span>
+                            </div>
+                            <button class="btn btn--primary produce-btn" id="produce-worker">
+                                Produce Worker
+                            </button>
+                            <div class="production-progress" id="worker-progress" style="display: none;">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" id="worker-progress-fill"></div>
+                                </div>
+                                <span class="progress-text" id="worker-progress-text">0%</span>
+                            </div>
+                        </div>
+
+                        <div class="unit-card" id="scout-card" style="display: none;">
+                            <div class="unit-header">
+                                <span class="unit-icon">🦗</span>
+                                <h3>Scout</h3>
+                            </div>
+                            <p class="unit-description">Explores territory and generates knowledge</p>
+                            <div class="unit-cost">
+                                <span class="cost-item">🧬 <span id="scout-biomass-cost">25</span></span>
+                                <span class="cost-item">⚡ <span id="scout-energy-cost">15</span></span>
+                                <span class="cost-item">🧠 <span id="scout-knowledge-cost">5</span></span>
+                            </div>
+                            <div class="unit-production-rate">
+                                <span class="production-item">🧠 +3/5s</span>
+                                <span class="production-item">🗺️ +0.5/5s</span>
+                            </div>
+                            <button class="btn btn--primary produce-btn" id="produce-scout">
+                                Produce Scout
+                            </button>
+                            <div class="production-progress" id="scout-progress" style="display: none;">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" id="scout-progress-fill"></div>
+                                </div>
+                                <span class="progress-text" id="scout-progress-text">0%</span>
+                            </div>
+                        </div>
+
+                        <div class="unit-card" id="soldier-card" style="display: none;">
+                            <div class="unit-header">
+                                <span class="unit-icon">🐞</span>
+                                <h3>Soldier</h3>
+                            </div>
+                            <p class="unit-description">Conquers territory and defends the hive</p>
+                            <div class="unit-cost">
+                                <span class="cost-item">🧬 <span id="soldier-biomass-cost">50</span></span>
+                                <span class="cost-item">⚡ <span id="soldier-energy-cost">30</span></span>
+                                <span class="cost-item">🧠 <span id="soldier-knowledge-cost">10</span></span>
+                            </div>
+                            <div class="unit-production-rate">
+                                <span class="production-item">🗺️ +2/8s</span>
+                            </div>
+                            <button class="btn btn--primary produce-btn" id="produce-soldier">
+                                Produce Soldier
+                            </button>
+                            <div class="production-progress" id="soldier-progress" style="display: none;">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" id="soldier-progress-fill"></div>
+                                </div>
+                                <span class="progress-text" id="soldier-progress-text">0%</span>
+                            </div>
+                        </div>
+
+                        <div class="unit-card" id="specialist-card" style="display: none;">
+                            <div class="unit-header">
+                                <span class="unit-icon">🕸️</span>
+                                <h3>Specialist</h3>
+                            </div>
+                            <p class="unit-description">Advanced unit with unique capabilities</p>
+                            <div class="unit-cost">
+                                <span class="cost-item">🧬 <span id="specialist-biomass-cost">100</span></span>
+                                <span class="cost-item">⚡ <span id="specialist-energy-cost">75</span></span>
+                                <span class="cost-item">🧠 <span id="specialist-knowledge-cost">25</span></span>
+                                <span class="cost-item">🗺️ <span id="specialist-territory-cost">5</span></span>
+                            </div>
+                            <div class="unit-production-rate">
+                                <span class="production-item">🧬 +5/12s</span>
+                                <span class="production-item">⚡ +3/12s</span>
+                                <span class="production-item">🧠 +2/12s</span>
+                                <span class="production-item">🗺️ +1/12s</span>
+                            </div>
+                            <button class="btn btn--primary produce-btn" id="produce-specialist">
+                                Produce Specialist
+                            </button>
+                            <div class="production-progress" id="specialist-progress" style="display: none;">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" id="specialist-progress-fill"></div>
+                                </div>
+                                <span class="progress-text" id="specialist-progress-text">0%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel - Goals -->
+            <div class="right-panel">
+                <div class="goals-panel">
+                    <h2>Goals</h2>
+                    <div class="goals-list" id="goals-list">
+                        <!-- Goals will be populated by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Settings Panel -->
+                <div class="settings-panel">
+                    <h3>Settings</h3>
+                    <div class="settings-controls">
+                        <div class="setting-item">
+                            <label for="game-speed">Game Speed</label>
+                            <select id="game-speed" class="form-control">
+                                <option value="0.5">0.5x</option>
+                                <option value="1" selected>1x</option>
+                                <option value="1.5">1.5x</option>
+                                <option value="2">2x</option>
+                            </select>
+                        </div>
+                        <div class="setting-item">
+                            <button class="btn btn--secondary" id="save-game">Save Game</button>
+                            <button class="btn btn--secondary" id="load-game">Load Game</button>
+                        </div>
+                        <div class="setting-item">
+                            <button class="btn btn--outline" id="reset-game">Reset Game</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Game Status -->
+        <div class="game-status" id="game-status">
+            <div class="status-item">
+                <span class="status-label">Total Units:</span>
+                <span class="status-value" id="total-units">0</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">Offline for:</span>
+                <span class="status-value" id="offline-time">0s</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification System -->
+    <div class="notifications" id="notifications"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>
