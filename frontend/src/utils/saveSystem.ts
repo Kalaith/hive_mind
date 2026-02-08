@@ -225,7 +225,7 @@ export class SaveSystem {
       const percentage = (used / available) * 100;
       
       return { used, available, percentage };
-    } catch (error) {
+    } catch {
       return { used: 0, available: 5 * 1024 * 1024, percentage: 0 };
     }
   }

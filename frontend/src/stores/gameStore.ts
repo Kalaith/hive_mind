@@ -62,6 +62,9 @@ interface GameStore extends GameState {
   // Evolution actions
   addEvolutionPoints: (points: number) => void;
   unlockBonus: (bonus: keyof EvolutionBonuses) => void;
+
+  // Settings actions
+  addPlaytime: (deltaMs: number) => void;
   
   // Game control
   startGame: () => void;
@@ -174,6 +177,14 @@ export const useGameStore = create<GameStore>()(
               ...state.evolution.bonuses,
               [bonus]: true,
             },
+          },
+        })),
+
+      addPlaytime: (deltaMs) =>
+        set((state) => ({
+          settings: {
+            ...state.settings,
+            totalPlaytime: state.settings.totalPlaytime + deltaMs,
           },
         })),
       
