@@ -14,7 +14,7 @@ interface UnitProduction {
   territory?: number;
 }
 
-const UNIT_PRODUCTION_RATES: Record<string, UnitProduction> = {
+const unitProductionRates: Record<string, UnitProduction> = {
   workers: { biomass: 2, energy: 1 },
   scouts: { territory: 1, knowledge: 0.5 },
   soldiers: { territory: 0.5 },
@@ -53,7 +53,7 @@ export const useGameLoop = (config: GameLoopConfig = { tickInterval: 1000, enabl
     let totalTerritory = 0;
 
     Object.entries(units).forEach(([unitType, count]) => {
-      const production = UNIT_PRODUCTION_RATES[unitType];
+      const production = unitProductionRates[unitType];
       if (!production || count === 0) return;
 
       if (production.biomass) totalBiomass += production.biomass * count * productionBonus;
@@ -102,11 +102,11 @@ export const useGameLoop = (config: GameLoopConfig = { tickInterval: 1000, enabl
       const lastSaved = gameStore.settings.lastSaved;
       const offlineTime = now - lastSaved;
 
-      const MIN_OFFLINE_TIME = 5 * 60 * 1000; // 5 minutes
-      const MAX_OFFLINE_TIME = 24 * 60 * 60 * 1000; // 24 hours max
+      const minOfflineTime = 5 * 60 * 1000; // 5 minutes
+      const maxOfflineTime = 24 * 60 * 60 * 1000; // 24 hours max
 
-      if (offlineTime > MIN_OFFLINE_TIME) {
-        const clampedOfflineTime = Math.min(offlineTime, MAX_OFFLINE_TIME);
+      if (offlineTime > minOfflineTime) {
+        const clampedOfflineTime = Math.min(offlineTime, maxOfflineTime);
         const offlineHours = clampedOfflineTime / (1000 * 60 * 60);
 
         const offlineMultiplier = 0.5; // 50% of normal production when offline
@@ -122,7 +122,7 @@ export const useGameLoop = (config: GameLoopConfig = { tickInterval: 1000, enabl
         let offlineTerritory = 0;
 
         Object.entries(units).forEach(([unitType, count]) => {
-          const production = UNIT_PRODUCTION_RATES[unitType];
+          const production = unitProductionRates[unitType];
           if (!production || count === 0) return;
 
           const hourlyProduction = count * 3600; // per hour baseline

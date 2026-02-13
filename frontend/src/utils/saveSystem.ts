@@ -17,15 +17,15 @@ export interface SaveMetadata {
   thumbnail?: string;
 }
 
-const SAVE_KEY_PREFIX = 'hive-mind-save-';
-const SAVE_SLOTS_KEY = 'hive-mind-save-slots';
-const CURRENT_SAVE_VERSION = '1.0.0';
-const MAX_SAVE_SLOTS = 5;
+const saveKeyPrefix = 'hive-mind-save-';
+const saveSlotsKey = 'hive-mind-save-slots';
+const currentSaveVersion = '1.0.0';
+const maxSaveSlots = 5;
 
 export class SaveSystem {
   static getSaveSlots(): SaveSlot[] {
     try {
-      const slotsData = localStorage.getItem(SAVE_SLOTS_KEY);
+      const slotsData = localStorage.getItem(saveSlotsKey);
       if (!slotsData) return [];
       
       const slots = JSON.parse(slotsData) as SaveSlot[];
@@ -45,40 +45,40 @@ export class SaveSystem {
       name: slotName || `Auto Save ${new Date(timestamp).toLocaleString()}`,
       timestamp,
       gameState: { ...gameState },
-      version: CURRENT_SAVE_VERSION,
+      version: currentSaveVersion,
       playTime: gameState.settings.totalPlaytime,
     };
     
     // Save the individual slot
-    localStorage.setItem(SAVE_KEY_PREFIX + saveId, JSON.stringify(saveSlot));
+    localStorage.setItem(saveKeyPrefix + saveId, JSON.stringify(saveSlot));
     
     // Update slots index
     const existingSlots = this.getSaveSlots();
     const updatedSlots = [saveSlot, ...existingSlots];
     
     // Limit number of saves
-    if (updatedSlots.length > MAX_SAVE_SLOTS) {
-      const removedSlots = updatedSlots.splice(MAX_SAVE_SLOTS);
+    if (updatedSlots.length > maxSaveSlots) {
+      const removedSlots = updatedSlots.splice(maxSaveSlots);
       // Clean up old saves
       removedSlots.forEach(slot => {
-        localStorage.removeItem(SAVE_KEY_PREFIX + slot.id);
+        localStorage.removeItem(saveKeyPrefix + slot.id);
       });
     }
     
-    localStorage.setItem(SAVE_SLOTS_KEY, JSON.stringify(updatedSlots));
+    localStorage.setItem(saveSlotsKey, JSON.stringify(updatedSlots));
     
     return saveSlot;
   }
   
   static loadGame(saveId: string): GameState | null {
     try {
-      const saveData = localStorage.getItem(SAVE_KEY_PREFIX + saveId);
+      const saveData = localStorage.getItem(saveKeyPrefix + saveId);
       if (!saveData) return null;
       
       const saveSlot = JSON.parse(saveData) as SaveSlot;
       
       // Version compatibility check
-      if (saveSlot.version !== CURRENT_SAVE_VERSION) {
+      if (saveSlot.version !== currentSaveVersion) {
         console.warn('Save version mismatch, attempting migration');
         return this.migrateSave(saveSlot);
       }
@@ -93,12 +93,12 @@ export class SaveSystem {
   static deleteSave(saveId: string): boolean {
     try {
       // Remove the save file
-      localStorage.removeItem(SAVE_KEY_PREFIX + saveId);
+      localStorage.removeItem(saveKeyPrefix + saveId);
       
       // Update slots index
       const existingSlots = this.getSaveSlots();
       const updatedSlots = existingSlots.filter(slot => slot.id !== saveId);
-      localStorage.setItem(SAVE_SLOTS_KEY, JSON.stringify(updatedSlots));
+      localStorage.setItem(saveSlotsKey, JSON.stringify(updatedSlots));
       
       return true;
     } catch (error) {
@@ -109,21 +109,21 @@ export class SaveSystem {
   
   static renameSave(saveId: string, newName: string): boolean {
     try {
-      const saveData = localStorage.getItem(SAVE_KEY_PREFIX + saveId);
+      const saveData = localStorage.getItem(saveKeyPrefix + saveId);
       if (!saveData) return false;
       
       const saveSlot = JSON.parse(saveData) as SaveSlot;
       saveSlot.name = newName;
       
       // Update the save file
-      localStorage.setItem(SAVE_KEY_PREFIX + saveId, JSON.stringify(saveSlot));
+      localStorage.setItem(saveKeyPrefix + saveId, JSON.stringify(saveSlot));
       
       // Update slots index
       const existingSlots = this.getSaveSlots();
       const updatedSlots = existingSlots.map(slot => 
         slot.id === saveId ? { ...slot, name: newName } : slot
       );
-      localStorage.setItem(SAVE_SLOTS_KEY, JSON.stringify(updatedSlots));
+      localStorage.setItem(saveSlotsKey, JSON.stringify(updatedSlots));
       
       return true;
     } catch (error) {
@@ -134,7 +134,7 @@ export class SaveSystem {
   
   static exportSave(saveId: string): string | null {
     try {
-      const saveData = localStorage.getItem(SAVE_KEY_PREFIX + saveId);
+      const saveData = localStorage.getItem(saveKeyPrefix + saveId);
       if (!saveData) return null;
       
       const saveSlot = JSON.parse(saveData) as SaveSlot;
@@ -162,12 +162,12 @@ export class SaveSystem {
       };
       
       // Save the imported slot
-      localStorage.setItem(SAVE_KEY_PREFIX + newSaveId, JSON.stringify(importedSlot));
+      localStorage.setItem(saveKeyPrefix + newSaveId, JSON.stringify(importedSlot));
       
       // Update slots index
       const existingSlots = this.getSaveSlots();
-      const updatedSlots = [importedSlot, ...existingSlots].slice(0, MAX_SAVE_SLOTS);
-      localStorage.setItem(SAVE_SLOTS_KEY, JSON.stringify(updatedSlots));
+      const updatedSlots = [importedSlot, ...existingSlots].slice(0, maxSaveSlots);
+      localStorage.setItem(saveSlotsKey, JSON.stringify(updatedSlots));
       
       return importedSlot;
     } catch (error) {
@@ -201,9 +201,9 @@ export class SaveSystem {
     try {
       const slots = this.getSaveSlots();
       slots.forEach(slot => {
-        localStorage.removeItem(SAVE_KEY_PREFIX + slot.id);
+        localStorage.removeItem(saveKeyPrefix + slot.id);
       });
-      localStorage.removeItem(SAVE_SLOTS_KEY);
+      localStorage.removeItem(saveSlotsKey);
       return true;
     } catch (error) {
       console.error('Failed to clear all saves:', error);
@@ -214,7 +214,7 @@ export class SaveSystem {
   private static migrateSave(saveSlot: SaveSlot): GameState | null {
     // Handle version migrations here
     // For now, just return the game state as-is
-    console.log('Migrating save from version', saveSlot.version, 'to', CURRENT_SAVE_VERSION);
+    console.log('Migrating save from version', saveSlot.version, 'to', currentSaveVersion);
     return saveSlot.gameState;
   }
   

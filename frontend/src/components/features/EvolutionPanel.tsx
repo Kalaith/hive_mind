@@ -13,7 +13,7 @@ interface EvolutionBonus {
   requirements: string;
 }
 
-const EVOLUTION_BONUSES: EvolutionBonus[] = [
+const evolutionBonuses: EvolutionBonus[] = [
   {
     id: 'enhancedMetabolism',
     name: 'Enhanced Metabolism',
@@ -128,7 +128,7 @@ const EvolutionPanel: React.FC = () => {
       </div>
       
       <div className="space-y-3 mb-4">
-        {EVOLUTION_BONUSES.map((bonus) => {
+        {evolutionBonuses.map((bonus) => {
           const isUnlocked = isEvolutionUnlocked(bonus);
           const isPurchased = evolution.bonuses[bonus.id];
           const canAffordBonus = canAfford({ knowledge: bonus.cost });

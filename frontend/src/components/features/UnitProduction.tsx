@@ -11,7 +11,7 @@ interface UnitType {
   unlockRequirement: string;
 }
 
-const UNIT_TYPES: UnitType[] = [
+const unitTypes: UnitType[] = [
   {
     id: 'workers',
     name: 'Workers',
@@ -101,7 +101,7 @@ const UnitProduction: React.FC = () => {
     <div className="bg-gray-800 p-4 rounded-lg">
       <h2 className="text-xl font-bold mb-4">Unit Production</h2>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {UNIT_TYPES.map((unitType) => {
+        {unitTypes.map((unitType) => {
           const isUnlocked = isUnitUnlocked(unitType);
           const currentCount = units[unitType.id as keyof typeof units] || 0;
           const cost = getUnitCost(unitType);
