@@ -1,7 +1,7 @@
-import { create } from 'zustand';
+import { create } from "zustand";
 
 export interface UIState {
-  activePanel: 'hive' | 'evolution' | 'goals' | 'stats';
+  activePanel: "hive" | "evolution" | "goals" | "stats";
   isSettingsOpen: boolean;
   isSaveMenuOpen: boolean;
   isHelpOpen: boolean;
@@ -12,7 +12,7 @@ export interface UIState {
 
 export interface Notification {
   id: string;
-  type: 'info' | 'success' | 'warning' | 'error';
+  type: "info" | "success" | "warning" | "error";
   title: string;
   message: string;
   timestamp: number;
@@ -21,8 +21,8 @@ export interface Notification {
 
 interface UIStore extends UIState {
   // Panel management
-  setActivePanel: (panel: UIState['activePanel']) => void;
-  
+  setActivePanel: (panel: UIState["activePanel"]) => void;
+
   // Modal management
   openSettings: () => void;
   closeSettings: () => void;
@@ -31,22 +31,24 @@ interface UIStore extends UIState {
   openHelp: () => void;
   closeHelp: () => void;
   closeAllModals: () => void;
-  
+
   // Unit selection
   selectUnit: (unitType: string) => void;
   clearUnitSelection: () => void;
-  
+
   // Notification system
-  addNotification: (notification: Omit<Notification, 'id' | 'timestamp'>) => void;
+  addNotification: (
+    notification: Omit<Notification, "id" | "timestamp">,
+  ) => void;
   removeNotification: (id: string) => void;
   clearNotifications: () => void;
-  
+
   // Game speed control
   setGameSpeed: (speed: number) => void;
 }
 
 const initialState: UIState = {
-  activePanel: 'hive',
+  activePanel: "hive",
   isSettingsOpen: false,
   isSaveMenuOpen: false,
   isHelpOpen: false,
@@ -57,10 +59,10 @@ const initialState: UIState = {
 
 export const useUIStore = create<UIStore>((set, get) => ({
   ...initialState,
-  
+
   // Panel management
   setActivePanel: (panel) => set({ activePanel: panel }),
-  
+
   // Modal management
   openSettings: () => set({ isSettingsOpen: true }),
   closeSettings: () => set({ isSettingsOpen: false }),
@@ -74,11 +76,11 @@ export const useUIStore = create<UIStore>((set, get) => ({
       isSaveMenuOpen: false,
       isHelpOpen: false,
     }),
-  
+
   // Unit selection
   selectUnit: (unitType) => set({ selectedUnitType: unitType }),
   clearUnitSelection: () => set({ selectedUnitType: null }),
-  
+
   // Notification system
   addNotification: (notification) => {
     const newNotification: Notification = {
@@ -86,25 +88,25 @@ export const useUIStore = create<UIStore>((set, get) => ({
       id: `notification-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       timestamp: Date.now(),
     };
-    
+
     set((state) => ({
       notifications: [...state.notifications, newNotification],
     }));
-    
+
     // Auto-remove notification after duration (default 5 seconds)
     const duration = notification.duration || 5000;
     setTimeout(() => {
       get().removeNotification(newNotification.id);
     }, duration);
   },
-  
+
   removeNotification: (id) =>
     set((state) => ({
-      notifications: state.notifications.filter(n => n.id !== id),
+      notifications: state.notifications.filter((n) => n.id !== id),
     })),
-  
+
   clearNotifications: () => set({ notifications: [] }),
-  
+
   // Game speed control
   setGameSpeed: (speed) => set({ gameSpeed: speed }),
 }));

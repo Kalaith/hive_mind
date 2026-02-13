@@ -1,34 +1,34 @@
-import React from 'react';
-import { useUIStore } from '../../stores/uiStore';
+import React from "react";
+import { useUIStore } from "../../stores/uiStore";
 
 const NotificationSystem: React.FC = () => {
   const { notifications, removeNotification } = useUIStore();
 
   const getNotificationStyles = (type: string) => {
     switch (type) {
-      case 'success':
-        return 'bg-green-600 border-green-500';
-      case 'warning':
-        return 'bg-yellow-600 border-yellow-500';
-      case 'error':
-        return 'bg-red-600 border-red-500';
-      case 'info':
+      case "success":
+        return "bg-green-600 border-green-500";
+      case "warning":
+        return "bg-yellow-600 border-yellow-500";
+      case "error":
+        return "bg-red-600 border-red-500";
+      case "info":
       default:
-        return 'bg-blue-600 border-blue-500';
+        return "bg-blue-600 border-blue-500";
     }
   };
 
   const getNotificationIcon = (type: string) => {
     switch (type) {
-      case 'success':
-        return '✅';
-      case 'warning':
-        return '⚠️';
-      case 'error':
-        return '❌';
-      case 'info':
+      case "success":
+        return "✅";
+      case "warning":
+        return "⚠️";
+      case "error":
+        return "❌";
+      case "info":
       default:
-        return 'ℹ️';
+        return "ℹ️";
     }
   };
 
@@ -45,10 +45,16 @@ const NotificationSystem: React.FC = () => {
         >
           <div className="flex items-start justify-between">
             <div className="flex items-start gap-2">
-              <span className="text-lg mt-0.5">{getNotificationIcon(notification.type)}</span>
+              <span className="text-lg mt-0.5">
+                {getNotificationIcon(notification.type)}
+              </span>
               <div className="flex-1">
-                <h4 className="text-white font-semibold text-sm">{notification.title}</h4>
-                <p className="text-white/90 text-xs mt-1">{notification.message}</p>
+                <h4 className="text-white font-semibold text-sm">
+                  {notification.title}
+                </h4>
+                <p className="text-white/90 text-xs mt-1">
+                  {notification.message}
+                </p>
               </div>
             </div>
             <button
@@ -58,23 +64,23 @@ const NotificationSystem: React.FC = () => {
               ×
             </button>
           </div>
-          
+
           {/* Progress bar for auto-dismiss */}
           <div className="mt-2 h-1 bg-white/20 rounded-full overflow-hidden">
-            <div 
+            <div
               className="h-full bg-white/50 transition-all ease-linear"
               style={{
-                width: '100%',
-                animationName: 'notification-progress',
+                width: "100%",
+                animationName: "notification-progress",
                 animationDuration: `${notification.duration || 5000}ms`,
-                animationTimingFunction: 'linear',
-                animationFillMode: 'forwards',
+                animationTimingFunction: "linear",
+                animationFillMode: "forwards",
               }}
             />
           </div>
         </div>
       ))}
-      
+
       <style>{`
         @keyframes notification-progress {
           from { width: 100%; }

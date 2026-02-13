@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import { fetchGoals } from '../../api/goalsApi';
-import type { Goal } from '../../types/Goal';
+import React, { useEffect, useState } from "react";
+import { fetchGoals } from "../../api/goalsApi";
+import type { Goal } from "../../types/Goal";
 
 const GoalsPanel: React.FC = () => {
   const [goals, setGoals] = useState<Goal[]>([]);

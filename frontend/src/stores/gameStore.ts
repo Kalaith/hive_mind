@@ -1,5 +1,5 @@
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
 export interface Resources {
   biomass: number;
@@ -55,22 +55,22 @@ interface GameStore extends GameState {
   addResource: (resource: keyof Resources, amount: number) => void;
   spendResources: (costs: Partial<Resources>) => boolean;
   canAfford: (costs: Partial<Resources>) => boolean;
-  
+
   // Unit actions
   addUnit: (unitType: keyof UnitCounts, amount: number) => void;
-  
+
   // Evolution actions
   addEvolutionPoints: (points: number) => void;
   unlockBonus: (bonus: keyof EvolutionBonuses) => void;
 
   // Settings actions
   addPlaytime: (deltaMs: number) => void;
-  
+
   // Game control
   startGame: () => void;
   pauseGame: () => void;
   resetGame: () => void;
-  
+
   // Save system
   saveGame: () => void;
   loadGame: (saveData: Partial<GameState>) => void;
@@ -117,7 +117,7 @@ export const useGameStore = create<GameStore>()(
   persist(
     (set, get) => ({
       ...initialState,
-      
+
       // Resource actions
       addResource: (resource, amount) =>
         set((state) => ({
@@ -126,31 +126,31 @@ export const useGameStore = create<GameStore>()(
             [resource]: Math.max(0, state.resources[resource] + amount),
           },
         })),
-      
+
       spendResources: (costs) => {
         const state = get();
         if (!state.canAfford(costs)) return false;
-        
+
         set((state) => ({
           resources: Object.entries(costs).reduce(
             (resources, [resource, cost]) => ({
               ...resources,
               [resource]: resources[resource as keyof Resources] - (cost || 0),
             }),
-            state.resources
+            state.resources,
           ),
         }));
         return true;
       },
-      
+
       canAfford: (costs) => {
         const { resources } = get();
         return Object.entries(costs).every(
           ([resource, cost]) =>
-            resources[resource as keyof Resources] >= (cost || 0)
+            resources[resource as keyof Resources] >= (cost || 0),
         );
       },
-      
+
       // Unit actions
       addUnit: (unitType, amount) =>
         set((state) => ({
@@ -159,7 +159,7 @@ export const useGameStore = create<GameStore>()(
             [unitType]: Math.max(0, state.units[unitType] + amount),
           },
         })),
-      
+
       // Evolution actions
       addEvolutionPoints: (points) =>
         set((state) => ({
@@ -168,7 +168,7 @@ export const useGameStore = create<GameStore>()(
             points: state.evolution.points + points,
           },
         })),
-      
+
       unlockBonus: (bonus) =>
         set((state) => ({
           evolution: {
@@ -187,12 +187,12 @@ export const useGameStore = create<GameStore>()(
             totalPlaytime: state.settings.totalPlaytime + deltaMs,
           },
         })),
-      
+
       // Game control
       startGame: () => set({ isGameRunning: true }),
       pauseGame: () => set({ isGameRunning: false }),
       resetGame: () => set({ ...initialState, isGameRunning: false }),
-      
+
       // Save system
       saveGame: () =>
         set((state) => ({
@@ -201,7 +201,7 @@ export const useGameStore = create<GameStore>()(
             lastSaved: Date.now(),
           },
         })),
-      
+
       loadGame: (saveData) =>
         set((state) => ({
           ...state,
@@ -213,7 +213,7 @@ export const useGameStore = create<GameStore>()(
         })),
     }),
     {
-      name: 'hive-mind-game-state',
+      name: "hive-mind-game-state",
       partialize: (state) => ({
         resources: state.resources,
         units: state.units,
@@ -221,6 +221,6 @@ export const useGameStore = create<GameStore>()(
         settings: state.settings,
         production: state.production,
       }),
-    }
-  )
+    },
+  ),
 );

@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useRef } from 'react';
-import { useGameStore } from '../stores/gameStore';
-import { useUIStore } from '../stores/uiStore';
+import { useCallback, useEffect, useRef } from "react";
+import { useGameStore } from "../stores/gameStore";
+import { useUIStore } from "../stores/uiStore";
 
 interface GameLoopConfig {
   tickInterval: number; // milliseconds between ticks
@@ -21,7 +21,9 @@ const unitProductionRates: Record<string, UnitProduction> = {
   specialists: { knowledge: 2, energy: -1 },
 };
 
-export const useGameLoop = (config: GameLoopConfig = { tickInterval: 1000, enabled: true }) => {
+export const useGameLoop = (
+  config: GameLoopConfig = { tickInterval: 1000, enabled: true },
+) => {
   const intervalRef = useRef<number | null>(null);
   const lastTickRef = useRef<number>(Date.now());
 
@@ -56,22 +58,47 @@ export const useGameLoop = (config: GameLoopConfig = { tickInterval: 1000, enabl
       const production = unitProductionRates[unitType];
       if (!production || count === 0) return;
 
-      if (production.biomass) totalBiomass += production.biomass * count * productionBonus;
-      if (production.energy) totalEnergy += production.energy * count * productionBonus;
-      if (production.knowledge) totalKnowledge += production.knowledge * count * knowledgeBonus;
-      if (production.territory) totalTerritory += production.territory * count * territoryBonus;
+      if (production.biomass)
+        totalBiomass += production.biomass * count * productionBonus;
+      if (production.energy)
+        totalEnergy += production.energy * count * productionBonus;
+      if (production.knowledge)
+        totalKnowledge += production.knowledge * count * knowledgeBonus;
+      if (production.territory)
+        totalTerritory += production.territory * count * territoryBonus;
     });
 
-    if (totalBiomass > 0) gameStore.addResource('biomass', totalBiomass * timeMultiplier * speedMultiplier);
-    if (totalEnergy > 0) gameStore.addResource('energy', totalEnergy * timeMultiplier * speedMultiplier);
-    if (totalKnowledge > 0) gameStore.addResource('knowledge', totalKnowledge * timeMultiplier * speedMultiplier);
-    if (totalTerritory > 0) gameStore.addResource('territory', totalTerritory * timeMultiplier * speedMultiplier);
+    if (totalBiomass > 0)
+      gameStore.addResource(
+        "biomass",
+        totalBiomass * timeMultiplier * speedMultiplier,
+      );
+    if (totalEnergy > 0)
+      gameStore.addResource(
+        "energy",
+        totalEnergy * timeMultiplier * speedMultiplier,
+      );
+    if (totalKnowledge > 0)
+      gameStore.addResource(
+        "knowledge",
+        totalKnowledge * timeMultiplier * speedMultiplier,
+      );
+    if (totalTerritory > 0)
+      gameStore.addResource(
+        "territory",
+        totalTerritory * timeMultiplier * speedMultiplier,
+      );
 
     // Award evolution points based on active unit count
-    const totalUnits = Object.values(units).reduce((sum, count) => sum + count, 0);
+    const totalUnits = Object.values(units).reduce(
+      (sum, count) => sum + count,
+      0,
+    );
     if (totalUnits > 0) {
       const evolutionRate = Math.log(totalUnits + 1) * 0.1; // logarithmic scaling
-      gameStore.addEvolutionPoints(evolutionRate * timeMultiplier * speedMultiplier);
+      gameStore.addEvolutionPoints(
+        evolutionRate * timeMultiplier * speedMultiplier,
+      );
     }
 
     gameStore.addPlaytime(deltaTime);
@@ -127,10 +154,30 @@ export const useGameLoop = (config: GameLoopConfig = { tickInterval: 1000, enabl
 
           const hourlyProduction = count * 3600; // per hour baseline
 
-          if (production.biomass) offlineBiomass += production.biomass * hourlyProduction * offlineHours * productionBonus;
-          if (production.energy) offlineEnergy += production.energy * hourlyProduction * offlineHours * productionBonus;
-          if (production.knowledge) offlineKnowledge += production.knowledge * hourlyProduction * offlineHours * knowledgeBonus;
-          if (production.territory) offlineTerritory += production.territory * hourlyProduction * offlineHours * territoryBonus;
+          if (production.biomass)
+            offlineBiomass +=
+              production.biomass *
+              hourlyProduction *
+              offlineHours *
+              productionBonus;
+          if (production.energy)
+            offlineEnergy +=
+              production.energy *
+              hourlyProduction *
+              offlineHours *
+              productionBonus;
+          if (production.knowledge)
+            offlineKnowledge +=
+              production.knowledge *
+              hourlyProduction *
+              offlineHours *
+              knowledgeBonus;
+          if (production.territory)
+            offlineTerritory +=
+              production.territory *
+              hourlyProduction *
+              offlineHours *
+              territoryBonus;
         });
 
         offlineBiomass *= offlineMultiplier;
@@ -138,16 +185,19 @@ export const useGameLoop = (config: GameLoopConfig = { tickInterval: 1000, enabl
         offlineKnowledge *= offlineMultiplier;
         offlineTerritory *= offlineMultiplier;
 
-        if (offlineBiomass > 0) gameStore.addResource('biomass', offlineBiomass);
-        if (offlineEnergy > 0) gameStore.addResource('energy', offlineEnergy);
-        if (offlineKnowledge > 0) gameStore.addResource('knowledge', offlineKnowledge);
-        if (offlineTerritory > 0) gameStore.addResource('territory', offlineTerritory);
+        if (offlineBiomass > 0)
+          gameStore.addResource("biomass", offlineBiomass);
+        if (offlineEnergy > 0) gameStore.addResource("energy", offlineEnergy);
+        if (offlineKnowledge > 0)
+          gameStore.addResource("knowledge", offlineKnowledge);
+        if (offlineTerritory > 0)
+          gameStore.addResource("territory", offlineTerritory);
 
         // Show offline progress notification
         const uiStore = useUIStore.getState();
         uiStore.addNotification({
-          type: 'success',
-          title: 'Welcome Back!',
+          type: "success",
+          title: "Welcome Back!",
           message: `You were away for ${Math.round(offlineHours)}h and gained resources!`,
           duration: 8000,
         });
@@ -166,4 +216,3 @@ export const useGameLoop = (config: GameLoopConfig = { tickInterval: 1000, enabl
     pauseLoop,
   };
 };
-

@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import type { Unit } from '../../types/Unit';
+import React, { useState } from "react";
+import type { Unit } from "../../types/Unit";
 
 interface UnitCardProps {
   unit: Unit;

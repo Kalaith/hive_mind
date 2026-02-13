@@ -1,5 +1,5 @@
-import { mockUnits } from '../mockData/units';
-import type { Unit } from '../types/Unit';
+import { mockUnits } from "../mockData/units";
+import type { Unit } from "../types/Unit";
 
 export const fetchUnits = async (): Promise<Unit[]> => {
   return Promise.resolve(mockUnits);

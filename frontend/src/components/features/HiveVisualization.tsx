@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import HiveCore from './HiveCore';
-import UnitCount from './UnitCount';
-import { fetchUnits } from '../../api/unitApi';
-import type { Unit } from '../../types/Unit';
+import React, { useEffect, useState } from "react";
+import HiveCore from "./HiveCore";
+import UnitCount from "./UnitCount";
+import { fetchUnits } from "../../api/unitApi";
+import type { Unit } from "../../types/Unit";
 
 const HiveVisualization: React.FC = () => {
   const [units, setUnits] = useState<Unit[]>([]);
