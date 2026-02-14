@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 interface UnitCountProps {
   id: string;
@@ -8,16 +8,10 @@ interface UnitCountProps {
   isVisible: boolean;
 }
 
-const UnitCount: React.FC<UnitCountProps> = ({
-  id,
-  icon,
-  label,
-  value,
-  isVisible,
-}) => {
+const UnitCount: React.FC<UnitCountProps> = ({ id, icon, label, value, isVisible }) => {
   return (
     <div
-      className={`bg-gray-700 p-2 rounded-lg flex flex-col items-center text-center ${isVisible ? "" : "hidden"}`}
+      className={`bg-gray-700 p-2 rounded-lg flex flex-col items-center text-center ${isVisible ? '' : 'hidden'}`}
       id={id}
     >
       <span className="text-3xl">{icon}</span>

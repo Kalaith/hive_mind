@@ -1,22 +1,22 @@
-import React from "react";
-import { useGameStore } from "../../stores/gameStore";
-import { useUIStore } from "../../stores/uiStore";
+import React from 'react';
+import { useGameStore } from '../../stores/gameStore';
+import { useUIStore } from '../../stores/uiStore';
 
 const Header: React.FC = () => {
   const { resources, evolution } = useGameStore();
   const { openSaveMenu, openSettings } = useUIStore();
 
   const formatNumber = (num: number): string => {
-    if (num >= 1000000) return (num / 1000000).toFixed(1) + "M";
-    if (num >= 1000) return (num / 1000).toFixed(1) + "K";
+    if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+    if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
     return Math.floor(num).toString();
   };
 
   const resourceConfig = [
-    { key: "biomass" as const, name: "Biomass", icon: "🟢" },
-    { key: "energy" as const, name: "Energy", icon: "⚡" },
-    { key: "knowledge" as const, name: "Knowledge", icon: "🧠" },
-    { key: "territory" as const, name: "Territory", icon: "🗺️" },
+    { key: 'biomass' as const, name: 'Biomass', icon: '🟢' },
+    { key: 'energy' as const, name: 'Energy', icon: '⚡' },
+    { key: 'knowledge' as const, name: 'Knowledge', icon: '🧠' },
+    { key: 'territory' as const, name: 'Territory', icon: '🗺️' },
   ];
 
   return (
@@ -27,25 +27,19 @@ const Header: React.FC = () => {
           <div className="flex items-center gap-2 bg-purple-700 p-2 rounded-lg">
             <span className="text-lg">🧬</span>
             <span className="text-sm font-medium">Evolution</span>
-            <span className="text-lg font-bold">
-              {formatNumber(evolution.points)}
-            </span>
+            <span className="text-lg font-bold">{formatNumber(evolution.points)}</span>
           </div>
         </div>
         <div className="flex items-center gap-2">
           <div className="flex flex-wrap items-center gap-2 mr-4">
-            {resourceConfig.map((resource) => (
+            {resourceConfig.map(resource => (
               <div
                 className="flex items-center gap-1 bg-gray-700 p-2 rounded-lg shadow-sm"
                 key={resource.key}
               >
                 <span className="text-lg">{resource.icon}</span>
-                <span className="text-sm font-medium hidden sm:inline">
-                  {resource.name}
-                </span>
-                <span className="text-lg font-bold">
-                  {formatNumber(resources[resource.key])}
-                </span>
+                <span className="text-sm font-medium hidden sm:inline">{resource.name}</span>
+                <span className="text-lg font-bold">{formatNumber(resources[resource.key])}</span>
               </div>
             ))}
           </div>

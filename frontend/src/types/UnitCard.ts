@@ -1,4 +1,4 @@
-import type { Unit } from "./Unit";
+import type { Unit } from './Unit';
 
 export interface UnitCardProps {
   unit: Unit;

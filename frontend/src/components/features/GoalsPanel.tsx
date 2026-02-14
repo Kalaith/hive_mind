@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
-import { fetchGoals } from "../../api/goalsApi";
-import type { Goal } from "../../types/Goal";
+import React, { useEffect, useState } from 'react';
+import { fetchGoals } from '../../api/goalsApi';
+import type { Goal } from '../../types/Goal';
 
 const GoalsPanel: React.FC = () => {
   const [goals, setGoals] = useState<Goal[]>([]);
@@ -18,7 +18,7 @@ const GoalsPanel: React.FC = () => {
     <div className="bg-gray-800 p-4 rounded-lg">
       <h2 className="text-xl font-bold mb-4">Goals</h2>
       <div className="space-y-4">
-        {goals.map((goal) => (
+        {goals.map(goal => (
           <div
             key={goal.id}
             className="bg-gray-700 p-4 rounded-lg shadow-md border border-gray-600"

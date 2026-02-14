@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import type { Unit } from "../../types/Unit";
+import React, { useState } from 'react';
+import type { Unit } from '../../types/Unit';
 
 interface UnitCardProps {
   unit: Unit;
@@ -11,7 +11,7 @@ const UnitCard: React.FC<UnitCardProps> = ({ unit }) => {
   const handleProduce = () => {
     if (progress === 0) {
       const interval = setInterval(() => {
-        setProgress((prev) => {
+        setProgress(prev => {
           const newProgress = prev + 10;
           if (newProgress >= 100) {
             clearInterval(interval);
@@ -47,10 +47,7 @@ const UnitCard: React.FC<UnitCardProps> = ({ unit }) => {
       <div className="mt-2">
         <span className="text-sm">Progress: {progress}%</span>
         <div className="h-2 bg-gray-600 rounded mt-1">
-          <div
-            className="h-2 bg-blue-500 rounded"
-            style={{ width: `${progress}%` }}
-          ></div>
+          <div className="h-2 bg-blue-500 rounded" style={{ width: `${progress}%` }}></div>
         </div>
       </div>
     </div>

@@ -1,12 +1,12 @@
-import React, { useEffect } from "react";
-import Header from "./Header";
-import HiveVisualization from "../features/HiveVisualization";
-import EvolutionPanel from "../features/EvolutionPanel";
-import UnitProduction from "../features/UnitProduction";
-import GoalsPanel from "../features/GoalsPanel";
-import NotificationSystem from "../ui/NotificationSystem";
-import { useGameStore } from "../../stores/gameStore";
-import { useGameLoop } from "../../hooks/useGameLoop";
+import React, { useEffect } from 'react';
+import Header from './Header';
+import HiveVisualization from '../features/HiveVisualization';
+import EvolutionPanel from '../features/EvolutionPanel';
+import UnitProduction from '../features/UnitProduction';
+import GoalsPanel from '../features/GoalsPanel';
+import NotificationSystem from '../ui/NotificationSystem';
+import { useGameStore } from '../../stores/gameStore';
+import { useGameLoop } from '../../hooks/useGameLoop';
 
 const AppLayout: React.FC = () => {
   const { units, startGame, isGameRunning } = useGameStore();
@@ -20,10 +20,7 @@ const AppLayout: React.FC = () => {
   }, [isGameRunning, startGame]);
 
   // Calculate total units
-  const totalUnits = Object.values(units).reduce(
-    (sum, count) => sum + count,
-    0,
-  );
+  const totalUnits = Object.values(units).reduce((sum, count) => sum + count, 0);
 
   return (
     <div className="bg-gray-900 text-white min-h-screen font-sans">
@@ -44,9 +41,9 @@ const AppLayout: React.FC = () => {
               <div className="mb-2">
                 <span className="text-sm">Game Status: </span>
                 <span
-                  className={`text-sm font-bold ${isRunning ? "text-green-400" : "text-red-400"}`}
+                  className={`text-sm font-bold ${isRunning ? 'text-green-400' : 'text-red-400'}`}
                 >
-                  {isRunning ? "Running" : "Paused"}
+                  {isRunning ? 'Running' : 'Paused'}
                 </span>
               </div>
             </div>
@@ -61,10 +58,8 @@ const AppLayout: React.FC = () => {
           </div>
           <div className="status-item">
             <span className="font-bold">Game Loop:</span>
-            <span
-              className={`ml-2 ${isRunning ? "text-green-400" : "text-red-400"}`}
-            >
-              {isRunning ? "Active" : "Inactive"}
+            <span className={`ml-2 ${isRunning ? 'text-green-400' : 'text-red-400'}`}>
+              {isRunning ? 'Active' : 'Inactive'}
             </span>
           </div>
         </div>

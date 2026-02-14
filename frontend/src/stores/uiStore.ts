@@ -1,7 +1,7 @@
-import { create } from "zustand";
+import { create } from 'zustand';
 
 export interface UIState {
-  activePanel: "hive" | "evolution" | "goals" | "stats";
+  activePanel: 'hive' | 'evolution' | 'goals' | 'stats';
   isSettingsOpen: boolean;
   isSaveMenuOpen: boolean;
   isHelpOpen: boolean;
@@ -12,7 +12,7 @@ export interface UIState {
 
 export interface Notification {
   id: string;
-  type: "info" | "success" | "warning" | "error";
+  type: 'info' | 'success' | 'warning' | 'error';
   title: string;
   message: string;
   timestamp: number;
@@ -21,7 +21,7 @@ export interface Notification {
 
 interface UIStore extends UIState {
   // Panel management
-  setActivePanel: (panel: UIState["activePanel"]) => void;
+  setActivePanel: (panel: UIState['activePanel']) => void;
 
   // Modal management
   openSettings: () => void;
@@ -37,9 +37,7 @@ interface UIStore extends UIState {
   clearUnitSelection: () => void;
 
   // Notification system
-  addNotification: (
-    notification: Omit<Notification, "id" | "timestamp">,
-  ) => void;
+  addNotification: (notification: Omit<Notification, 'id' | 'timestamp'>) => void;
   removeNotification: (id: string) => void;
   clearNotifications: () => void;
 
@@ -48,7 +46,7 @@ interface UIStore extends UIState {
 }
 
 const initialState: UIState = {
-  activePanel: "hive",
+  activePanel: 'hive',
   isSettingsOpen: false,
   isSaveMenuOpen: false,
   isHelpOpen: false,
@@ -61,7 +59,7 @@ export const useUIStore = create<UIStore>((set, get) => ({
   ...initialState,
 
   // Panel management
-  setActivePanel: (panel) => set({ activePanel: panel }),
+  setActivePanel: panel => set({ activePanel: panel }),
 
   // Modal management
   openSettings: () => set({ isSettingsOpen: true }),
@@ -78,18 +76,18 @@ export const useUIStore = create<UIStore>((set, get) => ({
     }),
 
   // Unit selection
-  selectUnit: (unitType) => set({ selectedUnitType: unitType }),
+  selectUnit: unitType => set({ selectedUnitType: unitType }),
   clearUnitSelection: () => set({ selectedUnitType: null }),
 
   // Notification system
-  addNotification: (notification) => {
+  addNotification: notification => {
     const newNotification: Notification = {
       ...notification,
       id: `notification-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       timestamp: Date.now(),
     };
 
-    set((state) => ({
+    set(state => ({
       notifications: [...state.notifications, newNotification],
     }));
 
@@ -100,13 +98,13 @@ export const useUIStore = create<UIStore>((set, get) => ({
     }, duration);
   },
 
-  removeNotification: (id) =>
-    set((state) => ({
-      notifications: state.notifications.filter((n) => n.id !== id),
+  removeNotification: id =>
+    set(state => ({
+      notifications: state.notifications.filter(n => n.id !== id),
     })),
 
   clearNotifications: () => set({ notifications: [] }),
 
   // Game speed control
-  setGameSpeed: (speed) => set({ gameSpeed: speed }),
+  setGameSpeed: speed => set({ gameSpeed: speed }),
 }));
