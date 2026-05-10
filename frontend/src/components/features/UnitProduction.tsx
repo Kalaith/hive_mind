@@ -61,7 +61,7 @@ const unitTypes: UnitType[] = [
 ];
 
 const UnitProduction: React.FC = () => {
-  const { units, resources, canAfford, spendResources, addUnit } = useGameStore();
+  const { units, resources, canAfford, createUnit } = useGameStore();
 
   const getUnitCost = (unitType: UnitType) => {
     const currentCount = units[unitType.id as keyof typeof units] || 0;
@@ -100,8 +100,7 @@ const UnitProduction: React.FC = () => {
     const cost = getUnitCost(unitType);
 
     if (canAfford(cost)) {
-      spendResources(cost);
-      addUnit(unitType.id as keyof typeof units, 1);
+      void createUnit(unitType.id as keyof typeof units);
     }
   };
 

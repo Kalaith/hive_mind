@@ -1,5 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { webhatcheryGameApi, type WebHatcheryGameState } from '../api/webhatcheryGameApi';
+import { useWebHatcherySessionStore } from './webhatcherySessionStore';
 
 export interface Resources {
   biomass: number;
@@ -51,28 +53,17 @@ export interface GameState {
 }
 
 interface GameStore extends GameState {
-  // Resource actions
-  addResource: (resource: keyof Resources, amount: number) => void;
-  spendResources: (costs: Partial<Resources>) => boolean;
+  isLoading: boolean;
+  error: string | null;
+  initializeBackend: () => Promise<void>;
+  createUnit: (unitType: keyof UnitCounts) => Promise<boolean>;
   canAfford: (costs: Partial<Resources>) => boolean;
-
-  // Unit actions
-  addUnit: (unitType: keyof UnitCounts, amount: number) => void;
-
-  // Evolution actions
-  addEvolutionPoints: (points: number) => void;
-  unlockBonus: (bonus: keyof EvolutionBonuses) => void;
-
-  // Settings actions
-  addPlaytime: (deltaMs: number) => void;
-
-  // Game control
-  startGame: () => void;
-  pauseGame: () => void;
-  resetGame: () => void;
-
-  // Save system
-  saveGame: () => void;
+  unlockBonus: (bonus: keyof EvolutionBonuses) => Promise<boolean>;
+  tickGame: (deltaMs: number, speedMultiplier: number) => Promise<void>;
+  startGame: () => Promise<void>;
+  pauseGame: () => Promise<void>;
+  resetGame: () => Promise<void>;
+  saveGame: () => Promise<void>;
   loadGame: (saveData: Partial<GameState>) => void;
 }
 
@@ -113,34 +104,74 @@ const initialState: GameState = {
   isGameRunning: false,
 };
 
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null;
+
+const applyBackendGame = (set: (state: Partial<GameStore>) => void, game: WebHatcheryGameState): void => {
+  const state = game.save.state;
+  if (!isRecord(state)) {
+    set({ isLoading: false, error: 'Backend returned an invalid game state.' });
+    return;
+  }
+
+  set({
+    resources: isRecord(state.resources) ? (state.resources as unknown as Resources) : initialState.resources,
+    units: isRecord(state.units) ? (state.units as unknown as UnitCounts) : initialState.units,
+    evolution: isRecord(state.evolution) ? (state.evolution as unknown as Evolution) : initialState.evolution,
+    settings: isRecord(state.settings) ? (state.settings as unknown as GameSettings) : initialState.settings,
+    production: isRecord(state.production) ? (state.production as unknown as Production) : initialState.production,
+    isGameRunning: state.isGameRunning === true,
+    isLoading: false,
+    error: null,
+  });
+};
+
+const loadBackendGame = async (): Promise<WebHatcheryGameState> => {
+  const session = useWebHatcherySessionStore.getState();
+  try {
+    return await session.loadGame();
+  } catch {
+    return await session.continueAsGuest();
+  }
+};
+
+const runIntent = async (
+  set: (state: Partial<GameStore>) => void,
+  intent: string,
+  payload: Record<string, unknown> = {},
+): Promise<WebHatcheryGameState> => {
+  set({ isLoading: true, error: null });
+  const game = await webhatcheryGameApi.applyIntent(intent, payload);
+  applyBackendGame(set, game);
+  return game;
+};
+
 export const useGameStore = create<GameStore>()(
   persist(
     (set, get) => ({
       ...initialState,
+      isLoading: false,
+      error: null,
 
-      // Resource actions
-      addResource: (resource, amount) =>
-        set(state => ({
-          resources: {
-            ...state.resources,
-            [resource]: Math.max(0, state.resources[resource] + amount),
-          },
-        })),
+      initializeBackend: async () => {
+        set({ isLoading: true, error: null });
+        try {
+          applyBackendGame(set, await loadBackendGame());
+        } catch (error) {
+          const message = error instanceof Error ? error.message : 'Unable to initialize game.';
+          set({ isLoading: false, error: message });
+        }
+      },
 
-      spendResources: costs => {
-        const state = get();
-        if (!state.canAfford(costs)) return false;
-
-        set(state => ({
-          resources: Object.entries(costs).reduce(
-            (resources, [resource, cost]) => ({
-              ...resources,
-              [resource]: resources[resource as keyof Resources] - (cost || 0),
-            }),
-            state.resources
-          ),
-        }));
-        return true;
+      createUnit: async unitType => {
+        try {
+          await runIntent(set, 'create_unit', { unitType });
+          return true;
+        } catch (error) {
+          const message = error instanceof Error ? error.message : 'Unable to create unit.';
+          set({ isLoading: false, error: message });
+          return false;
+        }
       },
 
       canAfford: costs => {
@@ -150,56 +181,62 @@ export const useGameStore = create<GameStore>()(
         );
       },
 
-      // Unit actions
-      addUnit: (unitType, amount) =>
-        set(state => ({
-          units: {
-            ...state.units,
-            [unitType]: Math.max(0, state.units[unitType] + amount),
-          },
-        })),
+      unlockBonus: async bonus => {
+        try {
+          await runIntent(set, 'unlock_bonus', { bonus });
+          return true;
+        } catch (error) {
+          const message = error instanceof Error ? error.message : 'Unable to unlock evolution.';
+          set({ isLoading: false, error: message });
+          return false;
+        }
+      },
 
-      // Evolution actions
-      addEvolutionPoints: points =>
-        set(state => ({
-          evolution: {
-            ...state.evolution,
-            points: state.evolution.points + points,
-          },
-        })),
+      tickGame: async (deltaMs, speedMultiplier) => {
+        try {
+          const game = await webhatcheryGameApi.applyIntent('tick', { deltaMs, speedMultiplier });
+          applyBackendGame(set, game);
+        } catch (error) {
+          const message = error instanceof Error ? error.message : 'Unable to update hive.';
+          set({ isLoading: false, error: message });
+        }
+      },
 
-      unlockBonus: bonus =>
-        set(state => ({
-          evolution: {
-            ...state.evolution,
-            bonuses: {
-              ...state.evolution.bonuses,
-              [bonus]: true,
-            },
-          },
-        })),
+      startGame: async () => {
+        try {
+          await runIntent(set, 'start_game');
+        } catch (error) {
+          const message = error instanceof Error ? error.message : 'Unable to start game.';
+          set({ isLoading: false, error: message });
+        }
+      },
 
-      addPlaytime: deltaMs =>
-        set(state => ({
-          settings: {
-            ...state.settings,
-            totalPlaytime: state.settings.totalPlaytime + deltaMs,
-          },
-        })),
+      pauseGame: async () => {
+        try {
+          await runIntent(set, 'pause_game');
+        } catch (error) {
+          const message = error instanceof Error ? error.message : 'Unable to pause game.';
+          set({ isLoading: false, error: message });
+        }
+      },
 
-      // Game control
-      startGame: () => set({ isGameRunning: true }),
-      pauseGame: () => set({ isGameRunning: false }),
-      resetGame: () => set({ ...initialState, isGameRunning: false }),
+      resetGame: async () => {
+        try {
+          await runIntent(set, 'reset_game');
+        } catch (error) {
+          const message = error instanceof Error ? error.message : 'Unable to reset game.';
+          set({ isLoading: false, error: message });
+        }
+      },
 
-      // Save system
-      saveGame: () =>
-        set(state => ({
-          settings: {
-            ...state.settings,
-            lastSaved: Date.now(),
-          },
-        })),
+      saveGame: async () => {
+        try {
+          await runIntent(set, 'save_game');
+        } catch (error) {
+          const message = error instanceof Error ? error.message : 'Unable to save game.';
+          set({ isLoading: false, error: message });
+        }
+      },
 
       loadGame: saveData =>
         set(state => ({

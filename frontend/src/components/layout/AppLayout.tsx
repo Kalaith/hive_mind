@@ -9,15 +9,14 @@ import { useGameStore } from '../../stores/gameStore';
 import { useGameLoop } from '../../hooks/useGameLoop';
 
 const AppLayout: React.FC = () => {
-  const { units, startGame, isGameRunning } = useGameStore();
+  const { units, startGame, initializeBackend, error } = useGameStore();
   const { isRunning } = useGameLoop();
 
-  // Auto-start game loop on load
   useEffect(() => {
-    if (!isGameRunning) {
-      startGame();
-    }
-  }, [isGameRunning, startGame]);
+    void initializeBackend().then(() => {
+      void startGame();
+    });
+  }, [initializeBackend, startGame]);
 
   // Calculate total units
   const totalUnits = Object.values(units).reduce((sum, count) => sum + count, 0);
@@ -46,6 +45,7 @@ const AppLayout: React.FC = () => {
                   {isRunning ? 'Running' : 'Paused'}
                 </span>
               </div>
+              {error && <p className="text-sm text-red-300">{error}</p>}
             </div>
           </div>
         </div>

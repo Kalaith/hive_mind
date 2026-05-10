@@ -57,7 +57,7 @@ const evolutionBonuses: EvolutionBonus[] = [
 ];
 
 const EvolutionPanel: React.FC = () => {
-  const { evolution, units, spendResources, canAfford, unlockBonus } = useGameStore();
+  const { evolution, units, canAfford, unlockBonus } = useGameStore();
   const { addNotification } = useUIStore();
 
   const formatNumber = (num: number): string => {
@@ -88,18 +88,19 @@ const EvolutionPanel: React.FC = () => {
     return false;
   };
 
-  const handlePurchaseEvolution = (bonus: EvolutionBonus) => {
+  const handlePurchaseEvolution = async (bonus: EvolutionBonus) => {
     const cost = { knowledge: bonus.cost };
 
     if (canAfford(cost)) {
-      spendResources(cost);
-      unlockBonus(bonus.id);
-      addNotification({
-        type: 'success',
-        title: 'Evolution Unlocked!',
-        message: `${bonus.name}: ${bonus.description}`,
-        duration: 6000,
-      });
+      const unlocked = await unlockBonus(bonus.id);
+      if (unlocked) {
+        addNotification({
+          type: 'success',
+          title: 'Evolution Unlocked!',
+          message: `${bonus.name}: ${bonus.description}`,
+          duration: 6000,
+        });
+      }
     }
   };
 
@@ -165,7 +166,7 @@ const EvolutionPanel: React.FC = () => {
                 <span className="text-xs text-purple-400">Cost: {bonus.cost} Knowledge</span>
                 {!isPurchased && (
                   <button
-                    onClick={() => handlePurchaseEvolution(bonus)}
+                    onClick={() => void handlePurchaseEvolution(bonus)}
                     disabled={!canAffordBonus}
                     className={`px-2 py-1 rounded text-xs font-medium transition-colors ${
                       canAffordBonus
